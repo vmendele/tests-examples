@@ -1,3 +1,9 @@
+// Cet exemple montre une application fastify avec deux routes :
+// - GET /todos permettant de récupérer une liste de todo
+// - POST /todos permettant de créer un todo.
+//
+// Les todos sont stockés dans MongoDB et la configuration de l'app est 
+// renseignée grâce aux envs.
 import fastify from "fastify";
 import { type TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
 import { type Static, Type } from "@sinclair/typebox"
@@ -47,9 +53,6 @@ export function createApp (opts: CreateAppOpts = defaultOpts) {
     })
 
     type Todo = Static<typeof todo>
-
-    const todos: Todo[] = []
-    let nextTodoId = 0
 
     app
         .register(fastifyMongodb, {
