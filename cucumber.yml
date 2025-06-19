@@ -1,0 +1,11 @@
+default:
+  paths:
+    - ./tests/uat/features/**/*.feature
+  import:
+    - ./tests/uat/steps/**/*.ts
+  format:
+    - "@cucumber/pretty-formatter"
+  worldParameters:
+    sut:
+      type: controlled-by-runner
+  language: fr
