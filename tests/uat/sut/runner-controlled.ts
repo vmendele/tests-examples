@@ -3,14 +3,18 @@ import { type Driver } from "./driver.ts";
 import { type SystemUnderTest } from "./system-under-test.ts";
 import supertest from "supertest";
 import { HttpDriver } from "./http-driver.ts";
+import { type CreateAppOpts } from "../../../src/uat/create-app.ts";
+import { MongoDBContainer, StartedMongoDBContainer } from "@testcontainers/mongodb";
 
 
 export type RunnerControlledSutOpts = {
-    createApp: () => FastifyInstance
+    createApp: (opts?: CreateAppOpts) => FastifyInstance
 }
 
 export class RunnerControlledSut implements SystemUnderTest {
     #opts: RunnerControlledSutOpts
+
+    #mongodb: StartedMongoDBContainer | undefined
     #app: FastifyInstance | undefined
     #agent: ReturnType<typeof supertest> | undefined
 
@@ -26,11 +30,21 @@ export class RunnerControlledSut implements SystemUnderTest {
 
     async teardown(): Promise<void> {
         await this.#app?.close()
+        await this.#mongodb?.stop()
     }
 
     async #startAppIfNotStarted () {
+        if (this.#mongodb === undefined) {
+            this.#mongodb = await new MongoDBContainer("mongo:8").start()
+        }
+
         if (this.#app === undefined) {
-            this.#app = this.#opts.createApp()
+            this.#app = this.#opts.createApp({
+                envs: {
+                    MONGODB_URL: this.#mongodb.getConnectionString(),
+                    MONGODB_DIRECT_CONNECTION: "true"
+                }
+            })
         }
 
         if (this.#agent === undefined) {
