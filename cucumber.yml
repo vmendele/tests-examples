@@ -8,4 +8,19 @@ default:
   worldParameters:
     sut:
       type: controlled-by-runner
+      testedMongoDBImage: mongo:8
+  language: fr
+
+default-mongo7:
+  default:
+  paths:
+    - ./tests/uat/features/**/*.feature
+  import:
+    - ./tests/uat/steps/**/*.ts
+  format:
+    - "@cucumber/pretty-formatter"
+  worldParameters:
+    sut:
+      type: controlled-by-runner
+      testedMongoDBImage: mongo:7
   language: fr

@@ -6,9 +6,9 @@ import { HttpDriver } from "./http-driver.ts";
 import { type CreateAppOpts } from "../../../src/uat/create-app.ts";
 import { MongoDBContainer, StartedMongoDBContainer } from "@testcontainers/mongodb";
 
-
 export type RunnerControlledSutOpts = {
     createApp: (opts?: CreateAppOpts) => FastifyInstance
+    testedMongoDBImage: string
 }
 
 export class RunnerControlledSut implements SystemUnderTest {
@@ -35,7 +35,7 @@ export class RunnerControlledSut implements SystemUnderTest {
 
     async #startAppIfNotStarted () {
         if (this.#mongodb === undefined) {
-            this.#mongodb = await new MongoDBContainer("mongo:8").start()
+            this.#mongodb = await new MongoDBContainer(this.#opts.testedMongoDBImage).start()
         }
 
         if (this.#app === undefined) {
